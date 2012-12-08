@@ -6,13 +6,13 @@
   - MySQL-python : `# pip-2.7 install MySQL-python` or `# easy_install-2.7 install MySQL-python`
 
 ## Usage
-  `./hadoop_log_miner.py loglevel logdate`
+  `$ ./hadoop_log_miner.py loglevel logdate`
 
   - example:
-  `./hadoop_log_miner.py INFO 2012-12-08`
+  `$ ./hadoop_log_miner.py INFO 2012-12-08`
 
   if you want all loglevels or dates, just set the cli argument as 'all',
-  eg: `./hadoop_log_miner.py all all`
+  eg: `$ ./hadoop_log_miner.py all all`
 
 ## Note
  - This script uses Hive's Python Thrift interface to interact with Hive, so before play with it 

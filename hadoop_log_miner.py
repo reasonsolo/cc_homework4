@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from hive_service import ThriftHive
 from hive_service.ttypes import HiveServerException
 from thrift import Thrift
@@ -9,7 +10,7 @@ import sys
 import os
 import time
 
-HADOOP_LOG_PATH = '/usr/share/hadoop/logs/'
+HADOOP_LOG_PATH = os.environ['HADOOP_HOME'] + '/logs/'
 TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 LOG_LEVELS = ['INFO', 'WARN', 'ERROR']
 
@@ -133,10 +134,11 @@ class HadoopLogMiner:
     tables = self.hive.execute("show tables")
     if tables != None and self.hive_table in tables:
       print('Hive table %s already exists' % self.hive_table)
-      pass
+      return False
     else:
       result = self.hive.execute(HIVE_CREATE_TABLE % self.hive_table, n = 1)
       print('Create Hive table %s, return: %s' % (self.hive_table, result))
+      return True
 
   def load_all_logfiles(self, path = HADOOP_LOG_PATH):
     for filepath in os.listdir(path):
@@ -224,6 +226,7 @@ class HiveClient:
         pass
     except AttributeError:
       raise HiveClientError("Client is not connected to any Thrift server")
+    print("hive> %s;" % query)
     self.client.execute(query)
     if n <= 0:
       return self.client.fetchAll()
@@ -250,8 +253,8 @@ if __name__ == '__main__':
 
   miner = HadoopLogMiner()
   miner.connect_hive()
-  miner.init_hive_table()
- #miner.load_all_logfiles() #uncomment this line to load hadoop log to hive
+  if miner.init_hive_table():
+    miner.load_all_logfiles()
   miner.connect_mysql()
   miner.save_hive_to_mysql(date = date, level = level)
 
